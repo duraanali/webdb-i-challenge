@@ -1,7 +1,7 @@
 const express = require('express');
 
 
-const db = require('../data/helpers/accountsModel');
+const db = require('../data/dbConfig');
 
 
 const router = express.Router();
@@ -23,13 +23,13 @@ const router = express.Router();
 
 
 router.get('/', (req, res) => {
-    db.get()
+    db('accounts')
+        .select('name', 'budget')
         .then(accounts => {
             res.status(200).json(accounts);
         })
         .catch(err => {
-            console.log(err);
-            res.status(500).json({ error: "Error getting projects" });
+            res.json(err);
         });
 });
 
