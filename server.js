@@ -6,4 +6,7 @@ const server = express();
 
 server.use(express.json());
 
+const accountsRouter = require('./accounts/accountsRouter');
+server.use('/api/accounts', accountsRouter);
+
 module.exports = server;
