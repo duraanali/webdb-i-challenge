@@ -7,19 +7,24 @@ const db = require('../data/dbConfig');
 const router = express.Router();
 
 
-// router.post('/', (req, res) => {
-//     const newProject = req.body;
-//     db.insert(newProject)
-//         .then(projects => {
-//             res.status(201).json(projects);
-//         })
-//         .catch(err => {
-//             res.status(500).json({
-//                 err: err,
-//                 message: "can not create anything bro"
-//             });
-//         });
-// });
+router.post('/', (req, res) => {
+    const postData = req.body;
+
+    db('accounts')
+        .insert(postData, 'name, budget')
+        .then(([name, budget]) => {
+            db('posts')
+                .where({ name, budget })
+                .first()
+                .then(accounts => {
+                    res.status(200).json(accounts);
+                });
+        })
+        .catch(err => {
+            res.json(err);
+        });
+});
+
 
 
 router.get('/', (req, res) => {
@@ -33,47 +38,30 @@ router.get('/', (req, res) => {
         });
 });
 
+router.put('/:id', (req, res) => {
+    const changes = req.body;
+    db('accounts')
+        .where('id', req.params.id)
+        .update(changes)
+        .then(count => {
+            res.status(200).json({ message: `updated ${count} record` });
+        })
+        .catch(err => {
+            res.json(err);
+        });
+});
 
-// router.delete('/:id', (req, res) => {
-//     const { id } = req.params;
-//     db.remove(id)
-//         .then(deletedUser => {
-//             if (deletedUser) {
-//                 res.json(deletedUser);
-//             } else {
-//                 res.status(404).json({
-//                     message: "invalid id"
-//                 })
-//             }
-//         })
-//         .catch(err => {
-//             res.status(500).json({
-//                 err: err,
-//                 message: "can not update anything bro"
-//             });
-//         });
-// });
+router.delete('/:id', (req, res) => {
 
-// router.put('/:id', (req, res) => {
-//     const { id } = req.params;
-//     const changes = req.body;
-//     db.update(id, changes)
-//         .then(updated => {
-//             if (updated) {
-//                 res.json(updated);
-//             } else {
-//                 res.status(404).json({
-//                     message: "invalid id"
-//                 })
-//             }
-//         })
-//         .catch(err => {
-//             res.status(500).json({
-//                 err: err,
-//                 message: "can not update anything bro"
-//             });
-//         });
-// });
-
+    db('accounts')
+        .where({ id: req.params.id })
+        .del()
+        .then(count => {
+            res.status(200).json({ message: `deleted ${count} records` });
+        })
+        .catch(err => {
+            res.json(err);
+        });
+});
 
 module.exports = router;
